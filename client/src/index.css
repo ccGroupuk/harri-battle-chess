@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Marvel Theme Palette */
+  --marvel-red: 0 76% 45%;      /* #cc0000 */
+  --marvel-dark: 230 20% 11%;   /* #161821 */
+  --marvel-blue: 213 78% 28%;   /* #103c85 */
+  --marvel-gold: 47 100% 50%;   /* #ffd700 */
+  --marvel-silver: 210 17% 85%; /* #dbe3eb */
+
+  --background: 230 20% 11%;
+  --foreground: 0 0% 100%;
+  
+  --primary: 0 76% 45%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 213 78% 28%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 228 15% 20%;
+  --muted-foreground: 215 20% 65%;
+  
+  --accent: 47 100% 50%;
+  --accent-foreground: 230 20% 11%;
+  
+  --destructive: 0 84% 60%;
+  --border: 228 15% 20%;
+  
+  --font-comic: 'Bangers', cursive;
+  --font-tech: 'Rajdhani', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(204, 0, 0, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(16, 60, 133, 0.15) 0%, transparent 50%);
+  }
+}
+
+.font-comic {
+  font-family: var(--font-comic);
+}
+
+.font-tech {
+  font-family: var(--font-tech);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background)); 
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted)); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary)); 
+}

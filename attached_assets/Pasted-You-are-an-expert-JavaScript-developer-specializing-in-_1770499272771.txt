@@ -1,0 +1,54 @@
+You are an expert JavaScript developer specializing in chess apps. Generate COMPLETE, production-ready code for adding a "Random Match" multiplayer mode to an existing web chess app.
+
+**Current App Setup (do NOT change existing code, just add modular functions):**
+- Uses chessboard.js for interactive board (cfg: draggable, onDrop for moves).
+- Uses chess.js for game state (board.load(fen), board.move(uci)).
+- Custom neon SVG chessboard skin (set as background-image on .chessboard).
+- HTML has a <div id="board"></div>, buttons for modes (vs AI, puzzles), game status <div id="status"></div>.
+- Responsive, mobile-friendly.
+
+**New Feature: "Play Random Online" Mode**
+- Add a prominent button: `<button id="randomMatchBtn">🔥 Play Random Online</button>` (neon glow style: box-shadow, gradient).
+- When clicked:
+  1. **Login Check**: Use Lichess OAuth2 PKCE (client-side, no server). Redirect to https://lichess.org/oauth for scopes: ['board:play']. Store access_token in localStorage.
+     - Button shows "Login to Lichess" if not logged in.
+     - Handle callback, exchange code+verifier for token.
+     - Logout button too.
+  2. **Create Seek**: POST https://lichess.org/api/board/seek (Bearer token auth).
+     - Params (form-urlencoded): time=5 (5 min), inc=3 (3s inc), rated=false (casual), variant=standard, color=random.
+     - Show "Waiting for opponent... 👀" with animated spinner on board.
+  3. **Event Stream**: Use EventSource on https://lichess.org/api/stream/event/{sri} (sri from login).
+     - Parse NDJSON lines.
+     - On "gameStart": fullGameState → extract gameId.
+  4. **Game Stream**: EventSource on https://lichess.org/api/board/{gameId}.
+     - Parse NDJSON: update FEN on "full", opponent moves → animate on board.
+     - User drags piece → validate with chess.js → get UCI → POST https://lichess.org/api/board/{gameId}/move {uci: 'e2e4'}.
+     - Handle game end ("gameEnd"), chat if possible.
+     - Show opponent username, clock, your color.
+  5. **UI Updates**:
+     - Overlay "Matched! vs @{opponent}" with confetti.
+     - Dual clocks (from stream).
+     - Status: "Your turn" / "Opponent thinking...".
+     - End screen: winner, rematch button (new seek).
+     - Error handling: seek timeout (cancel), disconnects, invalid moves.
+  6. **Integration**:
+     - Switch board mode: disable AI, enable multiplayer drag.
+     - Use existing neon skin.
+     - Pause/resume on tab focus.
+     - Mobile: touch-friendly.
+
+**Requirements:**
+- Vanilla JS + fetch/EventSource (no frameworks).
+- Modular: functions like initRandomMode(), loginLichess(), createSeek(), startGameStream(gameId).
+- Error-resilient: reconnect streams on error.
+- Secure: PKCE verifier random, SHA256.
+- Reference: Lichess API https://lichess.org/api#tag/Board-API, OAuth PKCE.
+- Style: Neon cyberpunk (glows, #00ff88/#ff00ff gradients).
+- Full HTML/JS snippet to drop in (e.g., <script> block).
+- Testable: Console logs, fallback to demo mode.
+
+Output:
+1. Full HTML/JS code block.
+2. Step-by-step integration guide.
+3. Example OAuth flow diagram (text).
+4. Potential issues & fixes table.
