@@ -27,10 +27,11 @@ export type Game = typeof games.$inferSelect;
 export type InsertGame = z.infer<typeof insertGameSchema>;
 export type GameBoard = (Piece | null)[][];
 
-// Leaderboard table
+// Leaderboard table (also serves as users table)
 export const leaderboard = pgTable("leaderboard", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name").notNull().unique(),
+  password: text("password").notNull().default(''), // Added for authentication
   photoUrl: text("photo_url"),
   wins: integer("wins").notNull().default(0),
   losses: integer("losses").notNull().default(0),

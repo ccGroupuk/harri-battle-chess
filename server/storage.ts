@@ -14,6 +14,8 @@ export interface IStorage {
   // Leaderboard methods
   getLeaderboard(): Promise<LeaderboardEntry[]>;
   getLeaderboardEntry(id: number): Promise<LeaderboardEntry | undefined>;
+  getUserByUsername(username: string): Promise<LeaderboardEntry | undefined>;
+  createUser(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry>;
   createLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry>;
   updateLeaderboardEntry(id: number, entry: Partial<InsertLeaderboardEntry>): Promise<LeaderboardEntry>;
   deleteLeaderboardEntry(id: number): Promise<void>;
@@ -58,6 +60,16 @@ export class DatabaseStorage implements IStorage {
   async getLeaderboardEntry(id: number): Promise<LeaderboardEntry | undefined> {
     const [entry] = await db.select().from(leaderboard).where(eq(leaderboard.id, id));
     return entry;
+  }
+
+  async getUserByUsername(username: string): Promise<LeaderboardEntry | undefined> {
+    const [user] = await db.select().from(leaderboard).where(sql`lower(${leaderboard.name}) = lower(${username})`);
+    return user;
+  }
+
+  async createUser(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry> {
+    const [created] = await db.insert(leaderboard).values(entry).returning();
+    return created;
   }
 
   async createLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry> {
