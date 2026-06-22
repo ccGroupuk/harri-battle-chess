@@ -93,9 +93,10 @@ export default function OnlineMatch() {
     }
   }, [phase, gameResult, currentPlayerId, gameInfo]);
 
+  const parsedPlayerId = currentPlayerId ? parseInt(currentPlayerId) : null;
   const { data: equippedItems = [] } = useQuery<PlayerPurchase[]>({
-    queryKey: ["/api/shop/equipped", currentPlayerId],
-    enabled: !!currentPlayerId,
+    queryKey: ["/api/shop/equipped", parsedPlayerId],
+    enabled: !!parsedPlayerId,
   });
 
   const { data: shopItems = [] } = useQuery<ShopItem[]>({

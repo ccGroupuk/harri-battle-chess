@@ -42,9 +42,10 @@ export default function GameRoom() {
     : null;
 
   // Fetch equipped items for current player
+  const parsedPlayerId = currentPlayerId ? parseInt(currentPlayerId) : null;
   const { data: equippedItems = [] } = useQuery<PlayerPurchase[]>({
-    queryKey: ["/api/shop/equipped", currentPlayerId],
-    enabled: !!currentPlayerId,
+    queryKey: ["/api/shop/equipped", parsedPlayerId],
+    enabled: !!parsedPlayerId,
   });
 
   // Fetch all shop items to get board theme data
