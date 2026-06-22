@@ -114,6 +114,9 @@ function ExplosionEffect({ onComplete }: { onComplete: () => void }) {
 interface BoardTheme {
   lightColor: string;
   darkColor: string;
+  backgroundImage?: string;
+  heroPieceStyle?: { textureUrl: string };
+  villainPieceStyle?: { textureUrl: string };
 }
 
 export interface MoveInfo {
@@ -125,7 +128,7 @@ export interface MoveInfo {
 interface GameBoardProps {
   board: BoardState;
   turn: 'w' | 'b';
-  onMove: (newBoard: BoardState, nextTurn: 'w' | 'b') => void;
+  onMove: (newBoard: BoardState, nextTurn: 'w' | 'b', capturedPieceType?: PieceType) => void;
   onRawMove?: (move: MoveInfo) => void;
   disabled?: boolean;
   boardTheme?: BoardTheme;
@@ -162,7 +165,7 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
     if (onRawMove && pendingMoveRef.current) {
       onRawMove({ from: pendingMoveRef.current.from, to: pendingMoveRef.current.to, promotion: pieceType });
     }
-    onMove(newBoard, turn === 'w' ? 'b' : 'w');
+    onMove(newBoard, turn === 'w' ? 'b' : 'w', (pendingPromotion as any).capturedPieceType);
     setPendingPromotion(null);
     pendingMoveRef.current = null;
     setSelected(null);
@@ -182,6 +185,8 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
       const movingPiece = board[fromR][fromC];
       
       const targetPiece = board[r][c];
+      const capturedPieceType = targetPiece ? targetPiece.type : undefined;
+
       if (targetPiece !== null) {
         setExplosion([r, c]);
       }
@@ -199,15 +204,16 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
         setPendingPromotion({
           board: newBoard,
           position: [r, c],
-          color: piece.color
-        });
+          color: piece.color,
+          capturedPieceType
+        } as any);
         return;
       }
 
       if (onRawMove) {
         onRawMove({ from: [fromR, fromC], to: [r, c] });
       }
-      onMove(newBoard, turn === 'w' ? 'b' : 'w');
+      onMove(newBoard, turn === 'w' ? 'b' : 'w', capturedPieceType);
       setSelected(null);
       setValidMoves([]);
     } else if (clickedPiece && clickedPiece.color === turn) {
@@ -227,7 +233,10 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
   return (
     <div className="relative aspect-square w-full max-w-[600px] mx-auto rounded-lg border-4 border-muted shadow-2xl bg-zinc-900">
       <div className="absolute inset-0 overflow-hidden rounded-md">
-      <div className="grid grid-cols-8 grid-rows-8 h-full w-full">
+      <div 
+        className="grid grid-cols-8 grid-rows-8 h-full w-full bg-cover bg-center"
+        style={{ backgroundImage: boardTheme.backgroundImage }}
+      >
         {board.map((row: (any)[], r: number) =>
           row.map((piece: any, c: number) => {
             const isDark = (r + c) % 2 === 1;
@@ -242,7 +251,9 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
                 data-testid={`square-${r}-${c}`}
                 onClick={() => handleSquareClick(r, c)}
                 style={{
-                  backgroundColor: isDark ? boardTheme.darkColor : boardTheme.lightColor,
+                  backgroundColor: boardTheme.backgroundImage 
+                    ? (isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.1)') 
+                    : (isDark ? boardTheme.darkColor : boardTheme.lightColor),
                 }}
                 className={cn(
                   "relative flex items-center justify-center cursor-pointer transition-colors duration-200",
@@ -269,7 +280,7 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
                       layoutId={`piece-${r}-${c}`}
                       className="w-full h-full p-1 pointer-events-none"
                     >
-                      <PieceIcon piece={piece} className="w-full h-full pointer-events-none" />
+                      <PieceIcon piece={piece} className="w-full h-full pointer-events-none" pieceStyle={piece.color === 'w' ? boardTheme?.heroPieceStyle : boardTheme?.villainPieceStyle} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -309,7 +320,7 @@ export function GameBoard({ board, turn, onMove, onRawMove, disabled, boardTheme
                     data-testid={`promote-${pieceType}`}
                   >
                     <div className="w-14 h-14 flex items-center justify-center">
-                      <PieceIcon piece={{ type: pieceType, color: pendingPromotion.color }} className="w-full h-full" />
+                      <PieceIcon piece={{ type: pieceType, color: pendingPromotion.color }} className="w-full h-full" pieceStyle={pendingPromotion.color === 'w' ? boardTheme?.heroPieceStyle : boardTheme?.villainPieceStyle} />
                     </div>
                     <span className="text-xs text-white capitalize">{pieceType}</span>
                   </button>

@@ -8,6 +8,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ShopItem, LeaderboardEntry, PlayerPurchase } from "@shared/schema";
 import { useState, useEffect } from "react";
+import { PieceIcon } from "@/components/PieceIcon";
 
 const ITEM_TYPE_ICONS: Record<string, typeof Grid3X3> = {
   board: Grid3X3,
@@ -215,25 +216,51 @@ export default function Shop() {
                               )}
                             </div>
 
-                            {item.type === 'board' && item.data && typeof item.data === 'object' && 'lightColor' in item.data ? (
+                            {item.type === 'board' && item.data && typeof item.data === 'object' ? (
                               <div className="mb-3 p-2 bg-black/20 rounded-lg">
-                                <div className="grid grid-cols-4 gap-0 w-full aspect-square rounded overflow-hidden border-2 border-yellow-600/50">
-                                  {[...Array(16)].map((_, i) => {
-                                    const row = Math.floor(i / 4);
-                                    const col = i % 4;
-                                    const isLight = (row + col) % 2 === 0;
-                                    return (
-                                      <div
-                                        key={i}
-                                        style={{
-                                          backgroundColor: isLight 
-                                            ? (item.data as any).lightColor 
-                                            : (item.data as any).darkColor
-                                        }}
-                                        className="aspect-square"
-                                      />
-                                    );
-                                  })}
+                                {('backgroundImage' in item.data) ? (
+                                  <div 
+                                    className="w-full aspect-square rounded overflow-hidden border-2 border-yellow-600/50 bg-cover bg-center"
+                                    style={{ backgroundImage: (item.data as any).backgroundImage }}
+                                  />
+                                ) : ('lightColor' in item.data) ? (
+                                  <div className="grid grid-cols-4 gap-0 w-full aspect-square rounded overflow-hidden border-2 border-yellow-600/50">
+                                    {[...Array(16)].map((_, i) => {
+                                      const row = Math.floor(i / 4);
+                                      const col = i % 4;
+                                      const isLight = (row + col) % 2 === 0;
+                                      return (
+                                        <div
+                                          key={i}
+                                          style={{
+                                            backgroundColor: isLight 
+                                              ? (item.data as any).lightColor 
+                                              : (item.data as any).darkColor
+                                          }}
+                                          className="aspect-square"
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                ) : null}
+                              </div>
+                            ) : item.type === 'piece_style' && item.data && typeof item.data === 'object' && ('textureUrl' in item.data) ? (
+                              <div 
+                                className="flex-1 h-24 rounded-lg mb-3 flex items-center justify-center bg-zinc-900 border-2 border-purple-500/30 p-2 gap-2"
+                              >
+                                <div className="w-12 h-12">
+                                  <PieceIcon 
+                                    piece={{ type: 'knight', color: item.name.toLowerCase().includes('villain') ? 'b' : 'w' }} 
+                                    className="w-full h-full pointer-events-none" 
+                                    pieceStyle={{ textureUrl: (item.data as any).textureUrl }}
+                                  />
+                                </div>
+                                <div className="w-12 h-12">
+                                  <PieceIcon 
+                                    piece={{ type: 'rook', color: item.name.toLowerCase().includes('villain') ? 'b' : 'w' }} 
+                                    className="w-full h-full pointer-events-none" 
+                                    pieceStyle={{ textureUrl: (item.data as any).textureUrl }}
+                                  />
                                 </div>
                               </div>
                             ) : (

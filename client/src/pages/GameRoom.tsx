@@ -54,20 +54,48 @@ export default function GameRoom() {
 
   // Get equipped board theme
   const equippedBoardTheme = (() => {
+    let theme: any = undefined;
+
     const equippedBoard = equippedItems.find(p => {
       const item = shopItems.find(i => i.id === p.itemId);
       return item?.type === 'board';
     });
+
     if (equippedBoard) {
       const item = shopItems.find(i => i.id === equippedBoard.itemId);
       if (item?.data && typeof item.data === 'object' && 'lightColor' in item.data) {
-        return {
+        theme = {
           lightColor: (item.data as any).lightColor as string,
           darkColor: (item.data as any).darkColor as string,
         };
+      } else if (item?.data && typeof item.data === 'object' && 'backgroundImage' in item.data) {
+        theme = {
+          lightColor: 'transparent',
+          darkColor: 'transparent',
+          backgroundImage: (item.data as any).backgroundImage as string,
+        };
       }
     }
-    return undefined;
+
+    const equippedPiece = equippedItems.find(p => {
+      const item = shopItems.find(i => i.id === p.itemId);
+      return item?.type === 'piece_style';
+    });
+
+    if (equippedPiece) {
+      const item = shopItems.find(i => i.id === equippedPiece.itemId);
+      if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+        if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
+        
+        if (item.name.toLowerCase().includes('villain')) {
+          theme.villainPieceStyle = { textureUrl: (item.data as any).textureUrl as string };
+        } else {
+          theme.heroPieceStyle = { textureUrl: (item.data as any).textureUrl as string };
+        }
+      }
+    }
+
+    return theme;
   })();
 
   // Mutation to award XP (atomic increment)
@@ -99,7 +127,7 @@ export default function GameRoom() {
     }
   }, [game]);
 
-  // Award XP based on game outcome: Win = 5 XP, Loss = 2 XP, Draw = 1 XP
+  // Award XP based on game outcome: Win = 500 XP, Loss = 2 XP, Draw = 1 XP
   useEffect(() => {
     if (game?.isGameOver && currentPlayerId && !xpAwardedRef.current) {
       xpAwardedRef.current = true;
@@ -107,7 +135,7 @@ export default function GameRoom() {
       
       if (game.winner === 'w') {
         // Player wins (heroes win)
-        xpAmount = 5;
+        xpAmount = 500;
       } else if (game.winner === 'b') {
         // Player loses (villains win)
         xpAmount = 2;
@@ -138,12 +166,24 @@ export default function GameRoom() {
       isGameOver: gameEnded,
       winner
     });
-  }, [gameId, updateGameMutation]);
+  }, [gameId, updateGameMutation, castlingRights]);
 
-  const handleMove = (newBoard: BoardState, nextTurn: 'w' | 'b') => {
+  const handleMove = (newBoard: BoardState, nextTurn: 'w' | 'b', capturedPieceType?: string) => {
     setLocalBoard(newBoard);
     setLocalTurn(nextTurn);
     executeMove(newBoard, nextTurn);
+    
+    // Award XP for capturing pieces if it's the player's turn (White)
+    if (capturedPieceType && currentPlayerId && localTurn === 'w') {
+      let captureXp = 10;
+      if (capturedPieceType === 'pawn') captureXp = 5;
+      else if (capturedPieceType === 'queen') captureXp = 25;
+      
+      awardXpMutation.mutate({ 
+        id: parseInt(currentPlayerId), 
+        amount: captureXp 
+      });
+    }
   };
 
   useEffect(() => {

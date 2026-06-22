@@ -13,8 +13,10 @@ import {
   BoardState, PieceColor, INITIAL_BOARD, moveToUCI,
   PieceType
 } from "@/lib/chess-engine";
-import type { Piece } from "@shared/schema";
+import type { Piece, PlayerPurchase, ShopItem } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 type MatchPhase = "idle" | "seeking" | "matched" | "playing" | "ended";
 
@@ -58,6 +60,94 @@ export default function OnlineMatch() {
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const playerId = useRef(generatePlayerId());
+  const currentPlayerId = localStorage.getItem("currentPlayerId");
+  const xpAwardedRef = useRef(false);
+
+  const awardXpMutation = useMutation({
+    mutationFn: async ({ id, amount }: { id: number, amount: number }) => {
+      const res = await apiRequest("POST", `/api/leaderboard/${id}/xp`, { amount });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
+    }
+  });
+
+  useEffect(() => {
+    if (phase === "ended" && gameResult && currentPlayerId && gameInfo && !xpAwardedRef.current) {
+      xpAwardedRef.current = true;
+      let xpAmount = 0;
+      
+      if (gameResult.winner === gameInfo.myColor) {
+        xpAmount = 500;
+      } else if (gameResult.winner) {
+        xpAmount = 2;
+      } else {
+        xpAmount = 1;
+      }
+      
+      awardXpMutation.mutate({ 
+        id: parseInt(currentPlayerId), 
+        amount: xpAmount 
+      });
+    }
+  }, [phase, gameResult, currentPlayerId, gameInfo]);
+
+  const { data: equippedItems = [] } = useQuery<PlayerPurchase[]>({
+    queryKey: ["/api/shop/equipped", currentPlayerId],
+    enabled: !!currentPlayerId,
+  });
+
+  const { data: shopItems = [] } = useQuery<ShopItem[]>({
+    queryKey: ["/api/shop/items"],
+  });
+
+  const equippedBoardTheme = (() => {
+    let theme: any = undefined;
+
+    const equippedBoard = equippedItems.find(p => {
+      const item = shopItems.find(i => i.id === p.itemId);
+      return item?.type === 'board';
+    });
+
+    if (equippedBoard) {
+      const item = shopItems.find(i => i.id === equippedBoard.itemId);
+      if (item?.data && typeof item.data === 'object' && 'lightColor' in item.data) {
+        theme = {
+          lightColor: (item.data as any).lightColor as string,
+          darkColor: (item.data as any).darkColor as string,
+        };
+      } else if (item?.data && typeof item.data === 'object' && 'backgroundImage' in item.data) {
+        theme = {
+          lightColor: 'transparent',
+          darkColor: 'transparent',
+          backgroundImage: (item.data as any).backgroundImage as string,
+        };
+      }
+    }
+
+    const equippedPiece = equippedItems.find(p => {
+      const item = shopItems.find(i => i.id === p.itemId);
+      return item?.type === 'piece_style';
+    });
+
+    if (equippedPiece) {
+      const item = shopItems.find(i => i.id === equippedPiece.itemId);
+      if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+        if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
+        
+        // Since we play as myColor, we apply our selected piece style to our color
+        const myColor = gameInfo?.myColor || 'w';
+        if (myColor === 'w') {
+          theme.heroPieceStyle = { textureUrl: (item.data as any).textureUrl as string };
+        } else {
+          theme.villainPieceStyle = { textureUrl: (item.data as any).textureUrl as string };
+        }
+      }
+    }
+
+    return theme;
+  })();
 
   const cleanup = useCallback(() => {
     if (eventSourceRef.current) {
@@ -260,7 +350,18 @@ export default function OnlineMatch() {
     }
   };
 
-  const handleBoardMove = (_newBoard: BoardState, _nextTurn: PieceColor) => {};
+  const handleBoardMove = (_newBoard: BoardState, _nextTurn: PieceColor, capturedPieceType?: string) => {
+    if (capturedPieceType && currentPlayerId && isMyTurn) {
+      let captureXp = 10;
+      if (capturedPieceType === 'pawn') captureXp = 5;
+      else if (capturedPieceType === 'queen') captureXp = 25;
+      
+      awardXpMutation.mutate({ 
+        id: parseInt(currentPlayerId), 
+        amount: captureXp 
+      });
+    }
+  };
 
   const handleRematch = () => {
     setPhase("idle");
@@ -268,6 +369,7 @@ export default function OnlineMatch() {
     setBoard(INITIAL_BOARD);
     setTurn("w");
     setGameInfo(null);
+    xpAwardedRef.current = false;
   };
 
   const isMyTurn = gameInfo ? turn === gameInfo.myColor : false;
@@ -589,6 +691,7 @@ export default function OnlineMatch() {
               onMove={handleBoardMove}
               onRawMove={handleRawMove}
               disabled={phase !== "playing" || !isMyTurn}
+              boardTheme={equippedBoardTheme}
             />
           )}
 

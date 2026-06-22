@@ -5,6 +5,7 @@ interface PieceIconProps {
   piece: Piece;
   className?: string;
   desaturated?: boolean;
+  pieceStyle?: { textureUrl: string };
 }
 
 const PIECE_LETTERS: Record<string, string> = {
@@ -248,7 +249,7 @@ const VILLAIN_SVGS: Record<string, () => JSX.Element> = {
   pawn: UltronDroneSVG,
 };
 
-export function PieceIcon({ piece, className, desaturated }: PieceIconProps) {
+export function PieceIcon({ piece, className, desaturated, pieceStyle }: PieceIconProps) {
   if (!piece || !piece.type || !piece.color) return null;
   const isWhite = piece.color === 'w';
 
@@ -277,13 +278,23 @@ export function PieceIcon({ piece, className, desaturated }: PieceIconProps) {
       title={HERO_NAMES[piece.type]?.[piece.color] || piece.type}
       data-testid={`piece-${piece.color}-${piece.type}`}
     >
-      <div className={`w-full h-full rounded-md border ${borderColor} bg-zinc-900/80 flex items-center justify-center relative overflow-hidden`}>
-        <div className="w-[90%] h-[90%]">
+      <div 
+        className={`w-full h-full rounded-md border ${borderColor} bg-zinc-900/80 flex items-center justify-center relative overflow-hidden`}
+        style={pieceStyle?.textureUrl ? {
+          backgroundImage: `url(${pieceStyle.textureUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundBlendMode: 'overlay',
+        } : undefined}
+      >
+        <div className="w-[90%] h-[90%] opacity-90 mix-blend-screen drop-shadow-md">
           <SvgComponent />
         </div>
-        <span className={`absolute bottom-0 right-0.5 text-[7px] font-black leading-none ${letterColor} opacity-70`}>
-          {PIECE_LETTERS[piece.type]}
-        </span>
+        <div className={`absolute bottom-0 right-0 w-5 h-5 rounded-tl-md flex items-center justify-center bg-zinc-950/90 border-l border-t ${borderColor} z-10 shadow-[-2px_-2px_4px_rgba(0,0,0,0.5)]`}>
+          <span className={`text-[11px] font-black leading-none ${letterColor}`}>
+            {PIECE_LETTERS[piece.type]}
+          </span>
+        </div>
       </div>
     </motion.div>
   );
