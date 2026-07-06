@@ -105,7 +105,7 @@ export default function Home() {
             <Skull className="w-10 h-10 md:w-12 md:h-12 text-red-600" />
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-comic text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-yellow-500 to-blue-600 drop-shadow-2xl">
-            HARRI BATTLE CHESS TEST
+            HARRI BATTLE CHESS
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground tracking-widest uppercase">
             Challenge the Champion
