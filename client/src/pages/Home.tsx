@@ -2,7 +2,8 @@ import { useCreateGame } from "@/hooks/use-game";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Skull, Zap, Bot, Users, Swords, Trophy, ShoppingBag, Globe } from "lucide-react";
+import { Shield, Skull, Zap, Bot, Users, Swords, Trophy, ShoppingBag, Globe, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import { GameMode } from "@shared/schema";
 
@@ -55,6 +56,7 @@ const MODES: ModeOption[] = [
 export default function Home() {
   const [, setLocation] = useLocation();
   const createGame = useCreateGame();
+  const { logoutMutation, user } = useAuth();
   const [selectedMode, setSelectedMode] = useState<GameMode>('local');
 
   const handleStartGame = async () => {
@@ -68,6 +70,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background">
+      <div className="absolute top-4 right-4 z-50">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => logoutMutation.mutate()}
+          disabled={logoutMutation.isPending}
+          className="bg-background/50 backdrop-blur-sm border-white/10 hover:bg-destructive/20 hover:text-destructive transition-colors"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          {user?.name ? `Sign out (${user.name})` : "Sign Out"}
+        </Button>
+      </div>
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-full h-full opacity-40">
