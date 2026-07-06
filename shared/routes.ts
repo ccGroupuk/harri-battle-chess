@@ -7,7 +7,8 @@ export const api = {
       method: "POST" as const,
       path: "/api/games",
       input: z.object({
-        gameMode: z.enum(['local', 'ai_easy', 'ai_medium', 'ai_hard', 'harri_smash']).optional().default('local'),
+        gameMode: z.enum(['local', 'ai_easy', 'ai_medium', 'ai_hard', 'harri_smash', 'custom']).optional().default('local'),
+        board: z.array(z.array(z.object({ type: z.string(), color: z.enum(['w', 'b']) }).nullable())).optional(),
       }),
       responses: {
         201: z.custom<typeof games.$inferSelect>(),

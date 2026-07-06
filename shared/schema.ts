@@ -10,7 +10,7 @@ export interface Piece {
   color: PieceColor;
 }
 
-export type GameMode = 'local' | 'ai_easy' | 'ai_medium' | 'ai_hard' | 'harri_smash';
+export type GameMode = 'local' | 'ai_easy' | 'ai_medium' | 'ai_hard' | 'harri_smash' | 'custom';
 
 export const games = pgTable("games", {
   id: serial("id").primaryKey(),

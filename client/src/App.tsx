@@ -13,6 +13,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Shop from "@/pages/Shop";
 import OnlineMatch from "@/pages/OnlineMatch";
 import AuthPage from "@/pages/AuthPage";
+import CustomArmyBuilder from "@/pages/CustomArmyBuilder";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/shop" component={Shop} />
       <Route path="/online" component={OnlineMatch} />
+      <Route path="/custom-army" component={CustomArmyBuilder} />
       <Route component={NotFound} />
     </Switch>
   );

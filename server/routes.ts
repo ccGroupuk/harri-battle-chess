@@ -20,7 +20,7 @@ export async function registerRoutes(
   app.post(api.games.create.path, async (req, res) => {
     try {
       const input = api.games.create.input.parse(req.body);
-      const board = initializeBoard();
+      const board = input.board ? (input.board as any) : initializeBoard();
       const game = await storage.createGame({
         board,
         turn: 'w',

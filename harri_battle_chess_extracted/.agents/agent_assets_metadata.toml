@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "O9YvzKcvGV3iNU5FEiHgc"
+uri = "file://db_export.tar.gz"
+type = "unspecified"
+title = "Database Export (schema + full data)"

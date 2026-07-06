@@ -51,6 +51,13 @@ const MODES: ModeOption[] = [
     icon: Swords,
     color: 'from-purple-600 to-purple-800',
   },
+  {
+    id: 'custom',
+    title: 'Custom Army',
+    description: 'Build your 16 pieces',
+    icon: Shield,
+    color: 'from-orange-600 to-orange-800',
+  },
 ];
 
 export default function Home() {
@@ -60,6 +67,11 @@ export default function Home() {
   const [selectedMode, setSelectedMode] = useState<GameMode>('local');
 
   const handleStartGame = async () => {
+    if (selectedMode === 'custom') {
+      setLocation('/custom-army');
+      return;
+    }
+
     try {
       const game = await createGame.mutateAsync({ gameMode: selectedMode });
       setLocation(`/game/${game.id}`);
