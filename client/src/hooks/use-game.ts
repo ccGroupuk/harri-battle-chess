@@ -21,10 +21,10 @@ export function useGame(id?: string) {
 export function useCreateGame() {
   const { toast } = useToast();
   return useMutation({
-    mutationFn: async ({ gameMode = 'local' }: { gameMode?: string } = {}) => {
+    mutationFn: async ({ gameMode = 'local', board }: { gameMode?: string, board?: any[] } = {}) => {
       const res = await fetch(api.games.create.path, {
         method: api.games.create.method,
-        body: JSON.stringify({ gameMode }),
+        body: JSON.stringify({ gameMode, board }),
         headers: { 'Content-Type': 'application/json' },
         credentials: "include",
       });
