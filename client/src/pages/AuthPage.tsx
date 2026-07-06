@@ -26,17 +26,27 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-600 rounded-full blur-[120px]" />
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-0 left-0 w-full h-full opacity-40">
+          <img 
+            src="/assets/hero.png" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+        </div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-900/20 rounded-full blur-[100px]" />
       </div>
 
       <Card className="w-full max-w-md z-10 bg-background/80 backdrop-blur-md border-white/10 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center items-center gap-3">
-            <Shield className="w-8 h-8 text-blue-500" />
-            <h1 className="text-2xl font-comic font-bold tracking-wider">HERO CHESS</h1>
-            <Skull className="w-8 h-8 text-red-500" />
+            <Shield className="w-8 h-8 md:w-10 md:h-10 text-blue-500" />
+            <h1 className="text-3xl md:text-4xl font-comic text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-yellow-500 to-blue-600 drop-shadow-2xl tracking-wider">
+              HARRI BATTLE CHESS
+            </h1>
+            <Skull className="w-8 h-8 md:w-10 md:h-10 text-red-500" />
           </div>
           <CardTitle className="text-xl">
             {isLogin ? "Welcome Back, Commander" : "Create Your Profile"}
