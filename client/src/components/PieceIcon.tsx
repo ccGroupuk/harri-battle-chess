@@ -15,6 +15,7 @@ const PIECE_LETTERS: Record<string, string> = {
   knight: 'N',
   rook: 'R',
   pawn: 'P',
+  copycat: 'C',
 };
 
 function CaptainAmericaSVG() {
@@ -231,6 +232,32 @@ function UltronDroneSVG() {
   );
 }
 
+function EchoSVG() {
+  return (
+    <svg viewBox="0 0 100 100" className="w-full h-full">
+      <path d="M30,70 C30,30 70,30 70,70" fill="none" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="50" cy="40" r="15" fill="#f8fafc" />
+      <path d="M45,45 Q50,55 55,45" fill="none" stroke="#0a0a0a" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="43" cy="35" r="2" fill="#0a0a0a" />
+      <circle cx="57" cy="35" r="2" fill="#0a0a0a" />
+      <path d="M35,60 L45,30 M65,60 L55,30" stroke="#eab308" strokeWidth="2" opacity="0.8" />
+    </svg>
+  );
+}
+
+function TaskmasterSVG() {
+  return (
+    <svg viewBox="0 0 100 100" className="w-full h-full">
+      <path d="M25,50 C25,20 75,20 75,50 L75,80 L25,80 Z" fill="#f97316" />
+      <ellipse cx="50" cy="55" rx="20" ry="25" fill="#171717" />
+      <circle cx="42" cy="50" r="4" fill="#ef4444" />
+      <circle cx="58" cy="50" r="4" fill="#ef4444" />
+      <path d="M40,70 L60,70" stroke="#f8fafc" strokeWidth="2" strokeLinecap="round" />
+      <path d="M45,65 L45,75 M50,65 L50,75 M55,65 L55,75" stroke="#f8fafc" strokeWidth="2" />
+    </svg>
+  );
+}
+
 const HERO_SVGS: Record<string, () => JSX.Element> = {
   king: CaptainAmericaSVG,
   queen: WonderWomanSVG,
@@ -238,6 +265,7 @@ const HERO_SVGS: Record<string, () => JSX.Element> = {
   knight: BlackPantherSVG,
   rook: SpiderManSVG,
   pawn: AntManSVG,
+  copycat: EchoSVG,
 };
 
 const VILLAIN_SVGS: Record<string, () => JSX.Element> = {
@@ -247,6 +275,7 @@ const VILLAIN_SVGS: Record<string, () => JSX.Element> = {
   knight: KillmongerSVG,
   rook: VenomSVG,
   pawn: UltronDroneSVG,
+  copycat: TaskmasterSVG,
 };
 
 export function PieceIcon({ piece, className, desaturated, pieceStyle }: PieceIconProps) {
@@ -307,6 +336,7 @@ export const PIECE_NAMES: Record<string, string> = {
   bishop: 'Bishop',
   knight: 'Knight',
   pawn: 'Pawn',
+  copycat: 'Copycat',
 };
 
 export const PIECE_SYMBOLS: Record<string, string> = {
@@ -316,4 +346,5 @@ export const PIECE_SYMBOLS: Record<string, string> = {
   bishop: '♝',
   knight: '♞',
   pawn: '♟',
+  copycat: '★',
 };

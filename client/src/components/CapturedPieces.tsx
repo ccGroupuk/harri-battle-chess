@@ -5,7 +5,7 @@ interface CapturedPiecesProps {
   board: BoardState;
 }
 
-const PIECE_ORDER: PieceType[] = ['queen', 'rook', 'bishop', 'knight', 'pawn'];
+const PIECE_ORDER: PieceType[] = ['queen', 'copycat', 'rook', 'bishop', 'knight', 'pawn'];
 
 const STARTING_COUNTS: Record<PieceType, number> = {
   king: 1,
@@ -14,16 +14,17 @@ const STARTING_COUNTS: Record<PieceType, number> = {
   bishop: 2,
   knight: 2,
   pawn: 8,
+  copycat: 0,
 };
 
 const PIECE_VALUES: Record<PieceType, number> = {
-  pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 0,
+  pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 0, copycat: 12,
 };
 
 function getCaptured(board: BoardState) {
   const current = {
-    w: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0 },
-    b: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0 },
+    w: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, copycat: 0 },
+    b: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, copycat: 0 },
   };
 
   for (const row of board) {

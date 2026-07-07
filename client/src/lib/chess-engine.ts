@@ -42,6 +42,7 @@ export const HERO_NAMES: Record<PieceType, { w: string, b: string }> = {
   knight: { w: "Black Panther", b: "Killmonger" },
   rook: { w: "Spider-Man", b: "Venom" },
   pawn: { w: "Ant-Man", b: "Ultron Drone" },
+  copycat: { w: "Echo", b: "Taskmaster" },
 };
 
 function isValidCoordinate(r: number, c: number): boolean {
@@ -132,6 +133,12 @@ function getRawMoves(board: BoardState, r: number, c: number): [number, number][
       addSlidingMoves([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
       break;
 
+    case 'copycat':
+      addSlidingMoves([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
+      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
+        .forEach(([dr, dc]) => addIfValid(r + dr, c + dc));
+      break;
+
     case 'king':
       [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
         .forEach(([dr, dc]) => addIfValid(r + dr, c + dc));
@@ -188,6 +195,12 @@ function getAttackSquares(board: BoardState, r: number, c: number): [number, num
 
     case 'queen':
       addSlidingAttacks([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
+      break;
+
+    case 'copycat':
+      addSlidingAttacks([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
+      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
+        .forEach(([dr, dc]) => addIfValid(r + dr, c + dc));
       break;
 
     case 'king':
@@ -393,11 +406,13 @@ const FEN_PIECE_MAP: Record<string, { type: PieceType; color: PieceColor }> = {
   'b': { type: 'bishop', color: 'b' },
   'q': { type: 'queen', color: 'b' },
   'k': { type: 'king', color: 'b' },
+  'C': { type: 'copycat', color: 'w' },
+  'c': { type: 'copycat', color: 'b' },
 };
 
 const PIECE_TO_FEN: Record<string, string> = {
-  'pawn-w': 'P', 'rook-w': 'R', 'knight-w': 'N', 'bishop-w': 'B', 'queen-w': 'Q', 'king-w': 'K',
-  'pawn-b': 'p', 'rook-b': 'r', 'knight-b': 'n', 'bishop-b': 'b', 'queen-b': 'q', 'king-b': 'k',
+  'pawn-w': 'P', 'rook-w': 'R', 'knight-w': 'N', 'bishop-w': 'B', 'queen-w': 'Q', 'king-w': 'K', 'copycat-w': 'C',
+  'pawn-b': 'p', 'rook-b': 'r', 'knight-b': 'n', 'bishop-b': 'b', 'queen-b': 'q', 'king-b': 'k', 'copycat-b': 'c',
 };
 
 export function parseFEN(fen: string): { board: BoardState; turn: PieceColor; castlingRights: CastlingRights } {

@@ -9,7 +9,7 @@ import { useCreateGame } from "@/hooks/use-game";
 import { PieceIcon, PIECE_NAMES } from "@/components/PieceIcon";
 import { useToast } from "@/hooks/use-toast";
 
-const AVAILABLE_PIECES: PieceType[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
+const AVAILABLE_PIECES: PieceType[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'copycat'];
 
 export default function CustomArmyBuilder() {
   const [, setLocation] = useLocation();

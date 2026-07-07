@@ -2,7 +2,7 @@ import { pgTable, text, serial, jsonb, boolean, integer, timestamp, uniqueIndex 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export type PieceType = 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king';
+export type PieceType = 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king' | 'copycat';
 export type PieceColor = 'w' | 'b';
 
 export interface Piece {
