@@ -272,7 +272,7 @@ export default function GameRoom() {
   const isWhiteTurn = localTurn === 'w';
   // In local mode, both players can move on their turn
   // In AI mode, only white (player) can move
-  const playerCanMove = !game.isGameOver && !isAIThinking && (gameMode === 'local' || isWhiteTurn);
+  const playerCanMove = !game.isGameOver && !isAIThinking && (gameMode === 'local' || gameMode === 'custom' || isWhiteTurn);
   
   // Check current game status for display
   const currentStatus = localBoard ? getGameStatus(localBoard, localTurn) : { status: 'playing' as const };
