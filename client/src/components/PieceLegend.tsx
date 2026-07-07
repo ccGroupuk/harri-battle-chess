@@ -1,7 +1,7 @@
 import { PieceIcon } from "./PieceIcon";
 import { PieceType, HERO_NAMES } from "@/lib/chess-engine";
 
-const PIECE_ORDER: PieceType[] = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'];
+const PIECE_ORDER: PieceType[] = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'copycat'];
 
 export function PieceLegend() {
   return (

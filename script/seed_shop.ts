@@ -52,6 +52,22 @@ async function seed() {
       price: 2000,
       imageUrl: "/assets/sinister_piece_texture.png",
       data: { textureUrl: "/assets/sinister_piece_texture.png" },
+    },
+    {
+      name: "Classic Wood Board",
+      description: "The OG. Traditional wooden light and dark squares.",
+      type: "board",
+      price: 500,
+      imageUrl: "",
+      data: { lightColor: "#f0d9b5", darkColor: "#b58863" },
+    },
+    {
+      name: "Classic Chess Pieces",
+      description: "The OG. Traditional classic chess piece symbols.",
+      type: "piece_style",
+      price: 500,
+      imageUrl: "",
+      data: { useClassicSvg: true },
     }
   ];
 

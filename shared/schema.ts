@@ -8,6 +8,7 @@ export type PieceColor = 'w' | 'b';
 export interface Piece {
   type: PieceType;
   color: PieceColor;
+  copiedType?: PieceType;
 }
 
 export type GameMode = 'local' | 'ai_easy' | 'ai_medium' | 'ai_hard' | 'harri_smash' | 'custom';

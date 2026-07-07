@@ -96,7 +96,9 @@ function getRawMoves(board: BoardState, r: number, c: number): [number, number][
     }
   };
 
-  switch (piece.type) {
+  const effectiveType = piece.type === 'copycat' ? (piece.copiedType || 'pawn') : piece.type;
+
+  switch (effectiveType) {
     case 'pawn':
       if (isValidCoordinate(r + direction, c) && !board[r + direction][c]) {
         moves.push([r + direction, c]);
@@ -133,11 +135,6 @@ function getRawMoves(board: BoardState, r: number, c: number): [number, number][
       addSlidingMoves([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
       break;
 
-    case 'copycat':
-      addSlidingMoves([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
-      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
-        .forEach(([dr, dc]) => addIfValid(r + dr, c + dc));
-      break;
 
     case 'king':
       [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
@@ -173,7 +170,9 @@ function getAttackSquares(board: BoardState, r: number, c: number): [number, num
     }
   };
 
-  switch (piece.type) {
+  const effectiveType = piece.type === 'copycat' ? (piece.copiedType || 'pawn') : piece.type;
+
+  switch (effectiveType) {
     case 'pawn':
       const direction = piece.color === 'w' ? -1 : 1;
       if (isValidCoordinate(r + direction, c - 1)) attacks.push([r + direction, c - 1]);
@@ -197,11 +196,6 @@ function getAttackSquares(board: BoardState, r: number, c: number): [number, num
       addSlidingAttacks([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
       break;
 
-    case 'copycat':
-      addSlidingAttacks([[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
-      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
-        .forEach(([dr, dc]) => addIfValid(r + dr, c + dc));
-      break;
 
     case 'king':
       [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
@@ -251,6 +245,18 @@ export function applyMove(board: BoardState, fromR: number, fromC: number, toR: 
   } else {
     newBoard[toR][toC] = newBoard[fromR][fromC];
     newBoard[fromR][fromC] = null;
+  }
+
+  if (piece) {
+    const typeToCopy = piece.type === 'copycat' ? (piece.copiedType || 'pawn') : piece.type;
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const p = newBoard[row][col];
+        if (p?.type === 'copycat' && p.color !== piece.color) {
+          p.copiedType = typeToCopy;
+        }
+      }
+    }
   }
 
   return newBoard;

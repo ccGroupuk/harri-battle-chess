@@ -5,7 +5,7 @@ interface PieceIconProps {
   piece: Piece;
   className?: string;
   desaturated?: boolean;
-  pieceStyle?: { textureUrl: string };
+  pieceStyle?: { textureUrl?: string; useClassicSvg?: boolean };
 }
 
 const PIECE_LETTERS: Record<string, string> = {
@@ -284,6 +284,28 @@ export function PieceIcon({ piece, className, desaturated, pieceStyle }: PieceIc
 
   const SvgMap = isWhite ? HERO_SVGS : VILLAIN_SVGS;
   const SvgComponent = SvgMap[piece.type];
+
+  if (pieceStyle?.useClassicSvg) {
+    const symbolColor = isWhite ? "text-slate-100" : "text-slate-900";
+    const textShadow = isWhite 
+      ? "drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" 
+      : "drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]";
+
+    return (
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className={`relative flex items-center justify-center ${desaturated ? 'opacity-50 grayscale' : ''} ${className || ''}`}
+        title={PIECE_NAMES[piece.type] || piece.type}
+        data-testid={`piece-${piece.color}-${piece.type}-classic`}
+      >
+        <span className={`text-6xl ${symbolColor} ${textShadow} leading-none select-none`}>
+          {PIECE_SYMBOLS[piece.type]}
+        </span>
+      </motion.div>
+    );
+  }
+
   if (!SvgComponent) return null;
 
   const glowStyle = isWhite

@@ -113,6 +113,60 @@ export default function CustomArmyBuilder() {
     }
   };
 
+  const startAIGame = async () => {
+    // Validation
+    let pieceCount = 0;
+    let kingCount = 0;
+
+    customGrid.forEach(row => {
+      row.forEach(cell => {
+        if (cell) {
+          pieceCount++;
+          if (cell.type === 'king') kingCount++;
+        }
+      });
+    });
+
+    if (pieceCount !== 16) {
+      toast({
+        title: "Invalid Army",
+        description: `You must place exactly 16 pieces. You have placed ${pieceCount}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (kingCount !== 1) {
+      toast({
+        title: "Invalid Army",
+        description: `You must have exactly 1 King. You have ${kingCount}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const fullBoard = [
+      INITIAL_BOARD[0].map(p => p ? { ...p } : null),
+      INITIAL_BOARD[1].map(p => p ? { ...p } : null),
+      Array(8).fill(null),
+      Array(8).fill(null),
+      Array(8).fill(null),
+      Array(8).fill(null),
+      customGrid[1].map(p => p ? { ...p } : null),
+      customGrid[0].map(p => p ? { ...p } : null),
+    ];
+
+    try {
+      const game = await createGame.mutateAsync({ 
+        gameMode: 'ai_medium', 
+        board: fullBoard as any 
+      });
+      setLocation(`/game/${game.id}`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
@@ -131,7 +185,11 @@ export default function CustomArmyBuilder() {
           <Button variant="outline" onClick={handleDefault}>Default</Button>
           <Button onClick={startCustomGame} disabled={createGame.isPending} className="font-bold">
             <Play className="w-4 h-4 mr-2" />
-            START BATTLE
+            VS PLAYER
+          </Button>
+          <Button onClick={startAIGame} disabled={createGame.isPending} className="font-bold bg-green-600 hover:bg-green-700">
+            <Play className="w-4 h-4 mr-2" />
+            VS AI
           </Button>
         </div>
       </div>

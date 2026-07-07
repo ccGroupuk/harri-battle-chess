@@ -244,22 +244,22 @@ export default function Shop() {
                                   </div>
                                 ) : null}
                               </div>
-                            ) : item.type === 'piece_style' && item.data && typeof item.data === 'object' && ('textureUrl' in item.data) ? (
+                            ) : item.type === 'piece_style' && item.data && typeof item.data === 'object' && (('textureUrl' in item.data) || ('useClassicSvg' in item.data)) ? (
                               <div 
                                 className="flex-1 h-24 rounded-lg mb-3 flex items-center justify-center bg-zinc-900 border-2 border-purple-500/30 p-2 gap-2"
                               >
-                                <div className="w-12 h-12">
+                                <div className="w-12 h-12 relative flex items-center justify-center">
                                   <PieceIcon 
                                     piece={{ type: 'knight', color: item.name.toLowerCase().includes('villain') ? 'b' : 'w' }} 
-                                    className="w-full h-full pointer-events-none" 
-                                    pieceStyle={{ textureUrl: (item.data as any).textureUrl }}
+                                    className="w-full h-full pointer-events-none absolute inset-0" 
+                                    pieceStyle={item.data as any}
                                   />
                                 </div>
-                                <div className="w-12 h-12">
+                                <div className="w-12 h-12 relative flex items-center justify-center">
                                   <PieceIcon 
                                     piece={{ type: 'rook', color: item.name.toLowerCase().includes('villain') ? 'b' : 'w' }} 
-                                    className="w-full h-full pointer-events-none" 
-                                    pieceStyle={{ textureUrl: (item.data as any).textureUrl }}
+                                    className="w-full h-full pointer-events-none absolute inset-0" 
+                                    pieceStyle={item.data as any}
                                   />
                                 </div>
                               </div>
