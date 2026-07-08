@@ -321,7 +321,7 @@ export default function GameRoom() {
       {/* XP Display in corner */}
       {currentPlayer && (
         <div 
-          className="fixed top-4 right-4 bg-gradient-to-r from-yellow-600 to-amber-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50"
+          className="fixed bottom-4 left-4 bg-gradient-to-r from-yellow-600 to-amber-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50"
           data-testid="xp-display"
         >
           <Star className="w-5 h-5" />
