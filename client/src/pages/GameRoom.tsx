@@ -244,6 +244,7 @@ export default function GameRoom() {
     return () => {
       clearTimeout(timeout);
       aiMoveInProgress.current = false;
+      setIsAIThinking(false);
     };
   }, [localTurn, game?.isGameOver]);
 
