@@ -258,6 +258,93 @@ function TaskmasterSVG() {
   );
 }
 
+// ---- Classic Staunton set ----
+// One generator per colour so white and black can never drift apart.
+const CLASSIC_COLORS: Record<'w' | 'b', { fill: string; stroke: string; detail: string }> = {
+  w: { fill: '#f4efe4', stroke: '#2c2118', detail: '#2c2118' },
+  b: { fill: '#2c2c2c', stroke: '#0c0c0c', detail: '#e6e0d4' },
+};
+
+function ClassicPieceSVG({ type, color }: { type: string; color: 'w' | 'b' }) {
+  const { fill, stroke, detail } = CLASSIC_COLORS[color];
+  const base = <path d="M12,52 H48 V48 C48,45 44.5,44 41,44 H19 C15.5,44 12,45 12,48 Z" />;
+
+  const shapes: Record<string, JSX.Element> = {
+    king: (
+      <>
+        <path d="M30,4 V15 M25,9.5 H35" stroke={stroke} strokeWidth={3.5} fill="none" />
+        <path d="M18,30 L20.5,18 L25,25 L30,15 L35,25 L39.5,18 L42,30 Z" />
+        <path d="M18,30 H42 L40,36 H20 Z" />
+        <path d="M22.5,36 C22.5,41 19.5,43 17,44 H43 C40.5,43 37.5,41 37.5,36 Z" />
+        {base}
+        <path d="M22,48 H38" stroke={detail} strokeWidth={1.5} fill="none" />
+      </>
+    ),
+    queen: (
+      <>
+        <path d="M13,22 L18,38 H42 L47,22 L41,28 L38,15 L34,26 L30,11 L26,26 L22,15 L19,28 Z" />
+        <circle cx="13" cy="21" r="3" />
+        <circle cx="22" cy="14" r="3" />
+        <circle cx="30" cy="10" r="3.5" />
+        <circle cx="38" cy="14" r="3" />
+        <circle cx="47" cy="21" r="3" />
+        <path d="M18,38 H42 L40,44 H20 Z" />
+        {base}
+        <path d="M22,48 H38" stroke={detail} strokeWidth={1.5} fill="none" />
+      </>
+    ),
+    rook: (
+      <>
+        <path d="M14,11 H21 V16 H26.5 V11 H33.5 V16 H39 V11 H46 V24 H14 Z" />
+        <path d="M18,24 H42 L39.5,40 H20.5 Z" />
+        <path d="M16,40 H44 V45 H16 Z" />
+        {base}
+      </>
+    ),
+    bishop: (
+      <>
+        <circle cx="30" cy="9" r="3.2" />
+        <path d="M30,13 C36.5,19 40,25 40,30.5 C40,35.5 35.5,39 30,39 C24.5,39 20,35.5 20,30.5 C20,25 23.5,19 30,13 Z" />
+        <path d="M30,20 V32 M24.5,26 H35.5" stroke={detail} strokeWidth={1.8} fill="none" />
+        <path d="M21,39 H39 L37,44 H23 Z" />
+        {base}
+      </>
+    ),
+    knight: (
+      <>
+        <path d="M22,44 C22,38 24,35.5 22.5,32 L15.5,31 C13,29 14,25.5 17,23.5 L26,18.5 C26.5,13.5 29.5,10 33.5,8.5 L35,13 L39.5,7 C45,12 47,20 46,28 C45,36 43.5,40 42.5,44 Z" />
+        <circle cx="28.5" cy="22.5" r={1.9} fill={detail} stroke="none" />
+        <path d="M40,14 C36,18 33.5,23 32.5,29" stroke={detail} strokeWidth={1.6} fill="none" />
+        {base}
+      </>
+    ),
+    pawn: (
+      <>
+        <circle cx="30" cy="17" r="7.5" />
+        <path d="M23.5,25 C23.5,31 19,37 16.5,44 H43.5 C41,37 36.5,31 36.5,25 Z" />
+        {base}
+      </>
+    ),
+    // Copycat mimics another piece, so it gets a twin-headed pawn
+    copycat: (
+      <>
+        <circle cx="24.5" cy="17" r="6.5" />
+        <circle cx="35.5" cy="17" r="6.5" />
+        <path d="M23.5,25 C23.5,31 19,37 16.5,44 H43.5 C41,37 36.5,31 36.5,25 Z" />
+        {base}
+      </>
+    ),
+  };
+
+  return (
+    <svg viewBox="0 0 60 60" className="w-full h-full">
+      <g fill={fill} stroke={stroke} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round">
+        {shapes[type] || shapes.pawn}
+      </g>
+    </svg>
+  );
+}
+
 const HERO_SVGS: Record<string, () => JSX.Element> = {
   king: CaptainAmericaSVG,
   queen: WonderWomanSVG,
@@ -286,22 +373,18 @@ export function PieceIcon({ piece, className, desaturated, pieceStyle }: PieceIc
   const SvgComponent = SvgMap[piece.type];
 
   if (pieceStyle?.useClassicSvg) {
-    const symbolColor = isWhite ? "text-slate-100" : "text-slate-900";
-    const textShadow = isWhite 
-      ? "drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" 
-      : "drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]";
-
     return (
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className={`relative flex items-center justify-center ${desaturated ? 'opacity-50 grayscale' : ''} ${className || ''}`}
+        style={{ filter: desaturated ? undefined : 'drop-shadow(0 2px 2px rgba(0,0,0,0.4))' }}
         title={PIECE_NAMES[piece.type] || piece.type}
         data-testid={`piece-${piece.color}-${piece.type}-classic`}
       >
-        <span className={`text-6xl ${symbolColor} ${textShadow} leading-none select-none`}>
-          {PIECE_SYMBOLS[piece.type]}
-        </span>
+        <div className="w-[92%] h-[92%]">
+          <ClassicPieceSVG type={piece.type} color={isWhite ? 'w' : 'b'} />
+        </div>
       </motion.div>
     );
   }

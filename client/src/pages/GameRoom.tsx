@@ -85,9 +85,14 @@ export default function GameRoom() {
 
     if (equippedPiece) {
       const item = shopItems.find(i => i.id === equippedPiece.itemId);
-      if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+      if (item?.data && typeof item.data === 'object' && 'useClassicSvg' in item.data) {
+        // The classic set replaces both armies, not just one side
         if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
-        
+        theme.heroPieceStyle = { useClassicSvg: true };
+        theme.villainPieceStyle = { useClassicSvg: true };
+      } else if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+        if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
+
         if (item.name.toLowerCase().includes('villain')) {
           theme.villainPieceStyle = { textureUrl: (item.data as any).textureUrl as string };
         } else {

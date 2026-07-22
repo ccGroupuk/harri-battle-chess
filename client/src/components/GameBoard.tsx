@@ -115,8 +115,8 @@ interface BoardTheme {
   lightColor: string;
   darkColor: string;
   backgroundImage?: string;
-  heroPieceStyle?: { textureUrl: string };
-  villainPieceStyle?: { textureUrl: string };
+  heroPieceStyle?: { textureUrl?: string; useClassicSvg?: boolean };
+  villainPieceStyle?: { textureUrl?: string; useClassicSvg?: boolean };
 }
 
 export interface MoveInfo {

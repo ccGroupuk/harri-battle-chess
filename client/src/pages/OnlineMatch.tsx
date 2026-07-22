@@ -134,9 +134,14 @@ export default function OnlineMatch() {
 
     if (equippedPiece) {
       const item = shopItems.find(i => i.id === equippedPiece.itemId);
-      if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+      if (item?.data && typeof item.data === 'object' && 'useClassicSvg' in item.data) {
+        // The classic set replaces both armies, not just one side
         if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
-        
+        theme.heroPieceStyle = { useClassicSvg: true };
+        theme.villainPieceStyle = { useClassicSvg: true };
+      } else if (item?.data && typeof item.data === 'object' && 'textureUrl' in item.data) {
+        if (!theme) theme = { lightColor: '#cbd5e1', darkColor: '#1e293b' };
+
         // Since we play as myColor, we apply our selected piece style to our color
         const myColor = gameInfo?.myColor || 'w';
         if (myColor === 'w') {
