@@ -5,7 +5,7 @@ import { useGame, useUpdateGame } from "@/hooks/use-game";
 import { GameBoard } from "@/components/GameBoard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Trophy, Bot, User, Swords, Star } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trophy, Bot, User, Swords, Star, Undo2 } from "lucide-react";
 import { Link } from "wouter";
 import { getGameStatus, BoardState, PieceType, isInCheck, CastlingRights, INITIAL_CASTLING_RIGHTS, updateCastlingRights, applyMove } from "@/lib/chess-engine";
 import { getAIMove, Difficulty } from "@/lib/chess-ai";
@@ -25,6 +25,15 @@ export default function GameRoom() {
   const [localBoard, setLocalBoard] = useState<BoardState | null>(null);
   const [localTurn, setLocalTurn] = useState<'w'|'b'>('w');
   const [castlingRights, setCastlingRights] = useState<CastlingRights>({ ...INITIAL_CASTLING_RIGHTS });
+
+  // Undo history: a snapshot of the state *before* each move is pushed here.
+  type MoveSnapshot = { board: BoardState; turn: 'w' | 'b'; castlingRights: CastlingRights };
+  const [history, setHistory] = useState<MoveSnapshot[]>([]);
+  const snapshot = (board: BoardState, turn: 'w' | 'b', cr: CastlingRights): MoveSnapshot => ({
+    board: board.map(row => row.map(cell => cell ? { ...cell } : null)),
+    turn,
+    castlingRights: { ...cr },
+  });
   const [isAIThinking, setIsAIThinking] = useState(false);
   const aiMoveInProgress = useRef(false);
   const xpAwardedRef = useRef(false);
@@ -175,6 +184,10 @@ export default function GameRoom() {
   }, [gameId, updateGameMutation, castlingRights]);
 
   const handleMove = (newBoard: BoardState, nextTurn: 'w' | 'b', capturedPieceType?: string) => {
+    // Remember the position before this move so it can be taken back
+    if (localBoard) {
+      setHistory(prev => [...prev, snapshot(localBoard, localTurn, castlingRights)]);
+    }
     setLocalBoard(newBoard);
     setLocalTurn(nextTurn);
     executeMove(newBoard, nextTurn);
@@ -192,6 +205,35 @@ export default function GameRoom() {
     }
   };
 
+  const handleUndo = useCallback(() => {
+    if (!gameId || history.length === 0) return;
+
+    const stack = [...history];
+    let restore = stack.pop()!;
+    // In AI games a "go" is player + AI reply, so step back to the player's (White) turn
+    if (isAIGame) {
+      while (restore.turn !== 'w' && stack.length > 0) {
+        restore = stack.pop()!;
+      }
+    }
+
+    setHistory(stack);
+    setLocalBoard(restore.board);
+    setLocalTurn(restore.turn);
+    setCastlingRights(restore.castlingRights);
+    xpAwardedRef.current = false;
+
+    updateGameMutation.mutate({
+      id: parseInt(gameId),
+      board: restore.board,
+      turn: restore.turn,
+      isGameOver: false,
+      winner: null,
+    });
+  }, [gameId, history, isAIGame, updateGameMutation]);
+
+  const canUndo = history.length > 0 && !isAIThinking && !game?.isGameOver;
+
   useEffect(() => {
     if (!localBoard || game?.isGameOver) return;
     if (localTurn !== 'b') return;
@@ -207,12 +249,14 @@ export default function GameRoom() {
     const timeout = setTimeout(() => {
       try {
         const aiMove = getAIMove(localBoard, 'b', difficulty);
-        
+
         if (aiMove) {
           const [fromR, fromC] = aiMove.from;
           const [toR, toC] = aiMove.to;
-          
+
           const movingPiece = localBoard[fromR][fromC];
+          // Remember the position before the AI replies, so undo can take back the whole round
+          setHistory(prev => [...prev, snapshot(localBoard, 'b', castlingRights)]);
           const newBoard = applyMove(localBoard, fromR, fromC, toR, toC);
           
           if (movingPiece) {
@@ -468,6 +512,18 @@ export default function GameRoom() {
               </span>
             </div>
           )}
+
+          <Button
+            onClick={handleUndo}
+            disabled={!canUndo}
+            variant="outline"
+            size="sm"
+            className="mt-4 gap-2 font-tech"
+            data-testid="button-undo"
+          >
+            <Undo2 className="w-4 h-4" />
+            Undo Last Go
+          </Button>
         </div>
 
         {/* Right Panel: Captured Pieces & Legend */}
